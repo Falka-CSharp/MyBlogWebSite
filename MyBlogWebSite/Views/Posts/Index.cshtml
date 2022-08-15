@@ -1,4 +1,9 @@
-﻿@model IEnumerable<MyBlogWebSite.Models.Post>
+﻿@*  @model IEnumerable<MyBlogWebSite.Models.Post>
+*@
+
+@model MyBlogWebSite.ViewModels.PostsViewModel
+
+@addTagHelper *,MyBlog
 
 @{
     ViewData["Title"] = "Index";
@@ -10,9 +15,32 @@
 <p>
     <a asp-action="Create">Створити нову публікацію</a>
 </p>
+
+<form method="get">
+    <div class="form-inline form-group">
+        <label class="control-label">Категорія:</label>
+        &nbsp;&nbsp;
+        <select name = "categoryId" asp-items="Model.Categories" class="form-control"></select>
+        &nbsp;&nbsp;&nbsp;
+        <input type="submit" value="Обрати" class="btn btn-success" />
+    </div>
+
+</form>
+
 <table class="table">
     <thead>
         <tr>
+            <th>Зображення</th>
+            <th>Категорія</th>
+            <th>Заголовок</th>
+            <th>Опис</th>
+            <th>Дата публікації</th>
+            <th>Управління</th>
+
+
+        </tr>
+
+        @*<tr>
             <th>
                 @Html.DisplayNameFor(model => model.Title)
             </th>
@@ -35,10 +63,10 @@
                 @Html.DisplayNameFor(model => model.Category)
             </th>
             <th></th>
-        </tr>
+        </tr>*@
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Posts) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Title)
@@ -70,3 +98,10 @@
 }
     </tbody>
 </table>
+
+<br />
+<!-- Pagination controls -->
+
+<page-link page-model="Model.Paginator" page-action ="Index"></page-link>
+
+<!-- /Pagination controls -->

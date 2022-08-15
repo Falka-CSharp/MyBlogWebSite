@@ -9,6 +9,7 @@ using MyBlogWebSite.Data;
 using MyBlogWebSite.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using MyBlogWebSite.ViewModels;
 
 namespace MyBlogWebSite.Controllers
 {
@@ -28,10 +29,37 @@ namespace MyBlogWebSite.Controllers
         }
 
         // GET: Posts
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? categoryId, int pageNumber = 1)
         {
-            var applicationDbContext = _context.Posts.Include(p => p.Category);
-            return View(await applicationDbContext.ToListAsync());
+            //* 1
+            var posts = _context?.Posts?.Include(p => p.Category).ToList();
+            if (categoryId != null && categoryId != 0)
+            {
+                posts = posts.Where(p => p.CategoryId == categoryId).ToList();
+            }
+            //* 2
+
+            int pageSize = 3; // Posts count on one page
+            int count = posts.Count;
+            var items = posts.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
+            //* 3
+            List<Category> categories = await _context.Categories.ToListAsync();
+            categories.Insert(0, new Category() { Id = 0, Name = "Всі категорії" });
+
+            //* 4
+
+            PageViewModel paginator = new PageViewModel(count, pageNumber, pageSize);
+            //* 5
+
+            PostsViewModel viewModel = new PostsViewModel()
+            {
+                Posts = items, Paginator = paginator, Categories = new SelectList(categories, "Id", "Name")
+            };
+
+            //var applicationDbContext = _context.Posts.Include(p => p.Category);
+            //return View(await applicationDbContext.ToListAsync());
+            return View(viewModel);
         }
 
         // GET: Posts/Details/5
